@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot Gastronómico Peruano</title>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 30px auto; }
+        #chat { border: 1px solid #ccc; padding: 10px; min-height: 200px; margin-bottom: 10px; }
+        .msg { margin: 5px 0; }
+        .user { font-weight: bold; color: blue; }
+        .bot { color: green; }
+    </style>
+</head>
+<body>
+    <h2>Asistente Gastronómico del Perú 🇵🇪</h2>
+    <div id="chat"></div>
+    <input type="text" id="input" placeholder="Escribe una región: Costa, Sierra o Selva">
+    <button onclick="send()">Enviar</button>
+
+    <script>
+        function send() {
+            let input = document.getElementById("input");
+            let message = input.value;
+            if (!message) return;
+            addMessage("Tú", message, "user");
+
+            fetch("/chat", {
+                method: "POST",
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({message})
+            })
+            .then(res => res.json())
+            .then(data => {
+                data.response.forEach(msg => addMessage("Bot", msg, "bot"));
+            });
+            input.value = "";
+        }
+
+        function addMessage(sender, text, cls) {
+            let div = document.getElementById("chat");
+            let msg = document.createElement("div");
+            msg.className = "msg " + cls;
+            msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            div.appendChild(msg);
+            div.scrollTop = div.scrollHeight;
+        }
+    </script>
+</body>
+</html>
